@@ -4,11 +4,12 @@
 
 # COMMAND ----------
 
-#dbutils.library.restartPython()
+dbutils.library.restartPython()
 
 # COMMAND ----------
 
-import openai
+from openai import OpenAI, AzureOpenAI
+
 import tiktoken
 encoding = tiktoken.encoding_for_model("gpt-4-1106-preview")
 
@@ -26,10 +27,11 @@ import yaml
 with open('config.yml', 'r') as file:
     config = yaml.safe_load(file)
 
-openai.api_key = config['az_oai']['api']
-openai.api_base = f"https://{config['az_oai']['endpoint']}.openai.azure.com"
-openai.api_type = 'azure'
-openai.api_version = '2023-05-15' 
+client = AzureOpenAI(
+    api_key = config['az_oai']['api'],
+    azure_endpoint = f"https://{config['az_oai']['endpoint']}.openai.azure.com",
+    api_version = '2023-05-15'
+)
 
 deployment_name = config['az_oai']['deployment']
 
@@ -42,20 +44,22 @@ deployment_name = config['az_oai']['deployment']
 
 def generate_response(messages, deployment_name = deployment_name, temperature = 0.0):
 
-    completion = openai.ChatCompletion.create(
-        engine=deployment_name, 
+    completion = client.chat.completions.create(
+        model=deployment_name, 
         messages=messages, 
         temperature=temperature)
     
-    response = completion.choices[0]['message']['content']
-    usage = completion.usage.to_dict()
+    #response = completion.choices[0]['message']['content']
+    #response = response.model_dump()['choices'][0]['message']['content']
+    response = completion.choices[0].message.content
+    usage = completion.usage.dict()
     return response, usage
     
-prompt = 'Spell ukulele backwards!'
+prompt = 'Spell ukulele backwards.'
 messages = [{'role' : 'system', 'content' : 'You are a helpful AI assistant.'},
             {'role' : 'user', 'content' : prompt}]
 
-response, usage = generate_response(messages)
+response, usage = generate_response(messages) 
 print(usage)
 print(response)
 
