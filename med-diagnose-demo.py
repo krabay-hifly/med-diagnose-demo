@@ -4,7 +4,8 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
+# MAGIC %pip install openpyxl
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -77,10 +78,6 @@ print(response)
 
 # MAGIC %md
 # MAGIC Load & prepare dataset
-
-# COMMAND ----------
-
-#%pip install openpyxl
 
 # COMMAND ----------
 
@@ -252,6 +249,7 @@ Folytatni kell?
 
             # placeholder for RAG
             response = 'Ide jön a RAG majd'
+            # lehet kell egy summary, de lehet siman a convo history eleg 
             pass
                               
         # update convo history with AI response
