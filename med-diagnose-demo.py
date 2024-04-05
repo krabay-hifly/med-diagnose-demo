@@ -235,22 +235,31 @@ Folytatni kell?
 
     def run(self, human_input: str):
 
-        user_message = [{"role": "user", "content" : human_input}]
-        message_to_run = self.messages + user_message
-        response = self.generate_response(messages = message_to_run)
-                              
-        # update convo history
+        # update convo history with human input
         human_input_formatted_for_history = "Páciens: " + human_input
         self.conversation_history_list.append(human_input_formatted_for_history)
 
+        # run assert_if_more_info_is_needed
+        self.keep_asking = self.assert_if_more_info_is_needed()
+
+        if self.keep_asking == 'IGEN':
+
+            user_message = [{"role": "user", "content" : human_input}]
+            message_to_run = self.messages + user_message
+            response = self.generate_response(messages = message_to_run)
+
+        else:
+
+            # placeholder for RAG
+            response = 'Ide jön a RAG majd'
+            pass
+                              
+        # update convo history with AI response
         AI_output_formatted_for_history = "Asszisztens: " + response
         self.conversation_history_list.append(AI_output_formatted_for_history)
 
         # set system prompt for next round
         self.set_system_prompt()
-
-        # run assert_if_more_info_is_needed
-        self.keep_asking = self.assert_if_more_info_is_needed()
 
         return response
 
@@ -273,16 +282,12 @@ print(response)
 
 # COMMAND ----------
 
-a.conversation_history_list
+i = 'csak az egyikben, és nincs más tünet'
+response = a.run(i)
 
 # COMMAND ----------
 
 a.keep_asking
-
-# COMMAND ----------
-
-i = 'csak az egyikben, és nincs más tünet'
-response = a.run(i)
 
 # COMMAND ----------
 
@@ -291,10 +296,6 @@ print(response)
 # COMMAND ----------
 
 a.conversation_history_list
-
-# COMMAND ----------
-
-a.keep_asking
 
 # COMMAND ----------
 
@@ -303,11 +304,11 @@ response = a.run(i)
 
 # COMMAND ----------
 
-print(response)
+a.keep_asking
 
 # COMMAND ----------
 
-a.keep_asking
+print(response)
 
 # COMMAND ----------
 
